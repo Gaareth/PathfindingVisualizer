@@ -18,7 +18,7 @@ public class MazeGenAlgorithms {
         mazeGenerationAlgorithms.add(new DepthFirst(drawPanel));
         mazeGenerationAlgorithms.add(new Prims(drawPanel));
         mazeGenerationAlgorithms.add(new RecursiveDivision(drawPanel));
-        mazeGenerationAlgorithms.add(new Ellers(drawPanel));
+        //mazeGenerationAlgorithms.add(new Ellers(drawPanel));  TODO: properly implement ellers
 
     }
 

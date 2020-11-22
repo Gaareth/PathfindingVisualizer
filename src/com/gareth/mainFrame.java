@@ -266,6 +266,7 @@ public class mainFrame extends JFrame {
         this.addKeyListener(new KeyListener());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1080, 720);
+        setTitle("Path-finding Visualizer");
 
         contentPane = new JPanel();
 
