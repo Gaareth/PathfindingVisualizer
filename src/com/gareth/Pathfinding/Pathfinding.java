@@ -17,6 +17,8 @@ public class Pathfinding {
     public int pathDrawTime = 50;
 
     private Graph graph;
+    private String name;
+
     public Node activeNode;
     public ArrayList<Node> visitedNodes;
     public ArrayList<Node> foundPath;
@@ -24,8 +26,9 @@ public class Pathfinding {
     public mainFrame.DrawPanel drawPanel;
 
 
-    public Pathfinding(mainFrame.DrawPanel drawPanel) {
+    public Pathfinding(mainFrame.DrawPanel drawPanel, String name) {
         this.drawPanel = drawPanel;
+        this.name = name;
     }
 
     public void solve(Node startNode, Node endNode, Graph graph, boolean diagonalSearch) throws InterruptedException {
@@ -35,7 +38,7 @@ public class Pathfinding {
 
     public void handleFoundPath() throws InterruptedException {
         System.out.println("Found path with distance: " + activeNode.getDistanceToParent() +  " blocks");
-        System.out.println(getNodeInfo(activeNode));
+        //System.out.println(getNodeInfo(activeNode));
         System.out.println(activeNode.getNodeType());
 
         graph.updateNode(activeNode, Node.NodeType.EndNode);
@@ -152,6 +155,14 @@ public class Pathfinding {
             graph.updateNode(node, Node.NodeType.FoundPath);
         }
         System.out.println("Constructed Solved Path");
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /*

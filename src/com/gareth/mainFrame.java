@@ -19,16 +19,19 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import static com.gareth.Utils.ColorUtils.interpolateColors;
+
 public class mainFrame extends JFrame {
 
     private JCheckBox diagonalSearchCheck;
     private JCheckBox nodeInfoCheck;
     private JCheckBox gradientColorCheck;
+    private JCheckBox infoCheckBoxNodeType;
+
 
     private JRadioButton infoRadioButtonDistParent;
     private JRadioButton infoRadioButtonPosAbs;
     private JRadioButton infoRadioButtonPosRel;
-    private JRadioButton infoRadioButtonNodeType;
 
     public static JLabel labelPriorityQueue;
 
@@ -93,6 +96,7 @@ public class mainFrame extends JFrame {
 
         });
 
+        /*
         int temp1 = getSelectedPathfindingAlgorithm().sleepTime;
         int temp2 = getSelectedPathfindingAlgorithm().pathDrawTime;
 
@@ -119,7 +123,7 @@ public class mainFrame extends JFrame {
 
         getSelectedPathfindingAlgorithm().sleepTime = temp1;
         getSelectedPathfindingAlgorithm().pathDrawTime = temp2;
-
+        */
 
 
 
@@ -444,8 +448,8 @@ public class mainFrame extends JFrame {
 
         infoRadioButtonPosRel.setSelected(true);
 
-        infoRadioButtonNodeType = new JRadioButton("Node Type");
-        infoRadioButtonNodeType.addActionListener((e) -> drawPanel.repaint());
+        infoCheckBoxNodeType = new JCheckBox("Node Type");
+        infoCheckBoxNodeType.addActionListener((e) -> drawPanel.repaint());
 
 
         buttonGroup.add(infoRadioButtonDistParent);
@@ -455,7 +459,7 @@ public class mainFrame extends JFrame {
         settingsPanelSettings.add(infoRadioButtonDistParent);
         settingsPanelSettings.add(infoRadioButtonPosAbs);
         settingsPanelSettings.add(infoRadioButtonPosRel);
-        settingsPanelSettings.add(infoRadioButtonNodeType);
+        settingsPanelSettings.add(infoCheckBoxNodeType);
 
         settingsPanel.add(settingsPanelSettings);
     }
@@ -712,13 +716,13 @@ public class mainFrame extends JFrame {
             super.paintComponent(g);
 
 
-            //ArrayList<Color> gradientColors = null;
 
-            //ArrayList<Color> gradientColors = interpolateColors(new Color(94, 79, 162), new Color(247, 148, 89), (float) maxDistance);
             //System.out.println("Gradients colors: "+ calculateMaxDistance());
-            //if (gradientColorCheck.isSelected())
-                //gradientColors = ColorUtils.interpolateColors(new Color(255, 0, 0), new Color(0, 0, 255), (int) calculateMaxDistanceToEnd());
-            //very inefficient ? yes
+            if (gradientColorCheck.isSelected() && currentMaxDistance == null) {
+                currentMaxDistance = calculateMaxDistance();
+                gradientColors = interpolateColors(new Color(255, 0, 0), new Color(0, 0, 255), currentMaxDistance.floatValue());
+            }
+                //very inefficient ? yes
 
             //System.out.println(maxNode.getNodeInfo());
 
@@ -732,13 +736,12 @@ public class mainFrame extends JFrame {
                 if (nodeInfoCheck.isSelected()) {
                     Rectangle rect = new Rectangle(cellNode.getX(), cellNode.getY(), cellNode.getSize(), cellNode.getSize());
                     //centerMultilineString(g, rect, String.format("%.2f", n.getDistanceToParent()));
-                    String info = infoRadioButtonDistParent.isSelected() ?
-                            String.format("%.2f %s", cellNode.getDistanceToParent(),
-                                    infoRadioButtonNodeType.isSelected() ? System.lineSeparator() + cellNode.getNodeType() : "")
-                            : infoRadioButtonPosAbs.isSelected() ? cellNode.getNodeInfoAbsolute(infoRadioButtonNodeType.isSelected())
-                            : infoRadioButtonPosRel.isSelected() ? cellNode.getNodeInfoRelative(infoRadioButtonNodeType.isSelected()) : "";
+                    String info = infoRadioButtonDistParent.isSelected() ? String.format("%.2f %s", cellNode.getDistanceToParent(),
+                                    infoCheckBoxNodeType.isSelected() ? System.lineSeparator() + cellNode.getNodeType() : "")
+                            : infoRadioButtonPosAbs.isSelected() ? cellNode.getNodeInfoAbsolute(infoCheckBoxNodeType.isSelected())
+                            : infoRadioButtonPosRel.isSelected() ? cellNode.getNodeInfoRelative(infoCheckBoxNodeType.isSelected()) : "";
 
-                    info = String.format("%s \n %s", cellNode.getInfo(), cellNode.getNodeInfoRelative(false));
+                    //info = String.format("%s \n %s", cellNode.getInfo(), cellNode.getNodeInfoRelative(false));
                     centerMultilineString(g, rect, info);
                 }
             }
@@ -750,32 +753,40 @@ public class mainFrame extends JFrame {
 
                 g.setColor(n.getColor());
 
-                if (gradientColorCheck.isSelected() && n.getDistanceToParent() < gradientColors.size()) {
-                    if (n.getNodeType() == Node.NodeType.VisitedNode ) {
-                        //g.setColor(gradientColors.get((int) Math.round(n.getDistanceToParent())));
-                        Color c = new Color(ColorUtils.calcColor(n.getDistanceToParent(), currentMaxDistance), 0.5F, 1F);
-                        g.setColor(c);
-                    }else if (n.getNodeType() == Node.NodeType.FoundPath) {
-                        g.setColor(gradientColors.get((int) Math.round(n.getDistanceToParent())));
-                     }
+                if (gradientColorCheck.isSelected()) {
+
+                    if (n.getDistanceToParent() >= gradientColors.size()) {
+                        currentMaxDistance = calculateMaxDistanceToEnd();
+                        gradientColors = interpolateColors(new Color(255, 0, 0), new Color(0, 0, 255), currentMaxDistance.floatValue());
+                    }
+
+                    if (n.getDistanceToParent() < gradientColors.size()) {
+                        if (n.getNodeType() == Node.NodeType.VisitedNode) {
+                            Color c = new Color(ColorUtils.calcColor(n.getDistanceToParent(), currentMaxDistance), 0.5F, 1F);
+                            g.setColor(c);
+                        } else if (n.getNodeType() == Node.NodeType.FoundPath) {
+                            g.setColor(gradientColors.get((int) Math.round(n.getDistanceToParent())));
+                        }
+                    }
                 }
 
                 g.fillRect(n.getX(), n.getY(), n.getSize(), n.getSize());
 
-                if (nodeInfoCheck.isSelected())
+                if (nodeInfoCheck.isSelected()) {
                     g.setColor(ColorUtils.getOppositeColor(n.getColor()));
 
 
-                Rectangle rect = new Rectangle(n.getX(), n.getY(), n.getSize(), n.getSize());
-                String info = infoRadioButtonDistParent.isSelected() ?
-                        String.format("%.2f %s", n.getDistanceToParent(),
-                                infoRadioButtonNodeType.isSelected() ? System.lineSeparator() + n.getNodeType() : "")
-                        : infoRadioButtonPosAbs.isSelected() ? n.getNodeInfoAbsolute(infoRadioButtonNodeType.isSelected())
-                        : infoRadioButtonPosRel.isSelected() ? n.getNodeInfoRelative(infoRadioButtonNodeType.isSelected()) : "";;
+                    Rectangle rect = new Rectangle(n.getX(), n.getY(), n.getSize(), n.getSize());
+                    String info = infoRadioButtonDistParent.isSelected() ? String.format("%.2f %s", n.getDistanceToParent(),
+                                    infoCheckBoxNodeType.isSelected() ? System.lineSeparator() + n.getNodeType() : "")
+                            : infoRadioButtonPosAbs.isSelected() ? n.getNodeInfoAbsolute(infoCheckBoxNodeType.isSelected())
+                            : infoRadioButtonPosRel.isSelected() ? n.getNodeInfoRelative(infoCheckBoxNodeType.isSelected()) : "";
+                    ;
 
-                info = String.format("%s \n %s", n.getInfo(), n.getNodeInfoRelative(false));
+                    //info = String.format("%s \n %s", n.getInfo(), n.getNodeInfoRelative(false));
 
-                centerMultilineString(g, rect, info);
+                    centerMultilineString(g, rect, info);
+                }
 
             }
 

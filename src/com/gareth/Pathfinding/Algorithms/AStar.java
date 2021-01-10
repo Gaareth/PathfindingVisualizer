@@ -10,8 +10,9 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 public class AStar extends Pathfinding {
-    public AStar(mainFrame.DrawPanel drawPanel) {
-        super(drawPanel);
+
+    public AStar(mainFrame.DrawPanel drawPanel, String name) {
+        super(drawPanel, name);
     }
 
     @Override

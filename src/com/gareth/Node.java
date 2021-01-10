@@ -147,8 +147,8 @@ public class Node implements Comparable<Node> {
 		Node rightNeighbour = getNodeByCoord(x+(size*sizeMultiplier), y, graph);
 
 		neighbours.add(topNeighbour);
-		neighbours.add(bottomNeighbour);
 		neighbours.add(leftNeighbour);
+		neighbours.add(bottomNeighbour);
 		neighbours.add(rightNeighbour);
 
 		if (diagonal) {

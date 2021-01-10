@@ -16,9 +16,10 @@ public class Dijkstra extends Pathfinding {
     Boolean diagonalSearch;
     Graph graph;
 
-    public Dijkstra(mainFrame.DrawPanel drawPanel) {
-        super(drawPanel);
+    public Dijkstra(mainFrame.DrawPanel drawPanel, String name) {
+        super(drawPanel, name);
     }
+
 
     // Updates values of nodes
     public void calculateNodeValues(Node currentNode) {
@@ -101,7 +102,6 @@ public class Dijkstra extends Pathfinding {
             // Dont set start node to visited for visual purposes
             if (!activeNode.sharesSameLocation(startNode)) {
                 graph.updateNode(activeNode, Node.NodeType.VisitedNode);
-                drawPanel.repaint();
             }
         }
 
