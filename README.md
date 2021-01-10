@@ -10,8 +10,6 @@ A Java Desktop Application to visualize various pathfinding and mazegeneration A
 # TODO
 
 
-- [ ] Fix Cell info
-
 - [ ] Fix zoom function
 - [ ] Zoom into mouse rather than the top left corner  
 
